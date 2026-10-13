@@ -1,0 +1,26 @@
+name: Build Telessage Desktop
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build application
+        shell: pwsh
+        run: msbuild TelessageDesktop.csproj /restore /p:Configuration=Release
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: Telessage-Desktop-Windows
+          path: bin/Release/
+          if-no-files-found: error
+          retention-days: 14
