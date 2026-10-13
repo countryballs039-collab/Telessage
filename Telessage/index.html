@@ -1729,4 +1729,75 @@ body.telessage-mobile-ui:not(.mobile-chat-open) .main{display:flex!important}
 
 
 
+
+<!-- Telessage Mobile HotFix 5.0.1: touch responsiveness and faster connection warm-up -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+<link rel="preconnect" href="https://dhcjehcctvslfnnmprac.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="//dhcjehcctvslfnnmprac.supabase.co">
+<style id="telessage-mobile-hotfix-501">
+  html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  button,a,[role="button"],input,select,textarea,label,.contact,.iconbtn,.chat-action,.send,.btn{
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  @media (pointer:coarse){
+    button,a,[role="button"],.contact,.iconbtn,.chat-action,.send,.btn{
+      cursor:pointer;
+    }
+    input,select,textarea{font-size:16px;max-width:100%}
+    #telessageApp,#telessageApp .sidebar,#telessageApp .main,
+    #telessageApp .contacts,#telessageApp .messages,
+    #settingsModal .settings-dialog{
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+    }
+    #telessageApp button,#telessageApp .contact,
+    #authGate button,#settingsModal button{
+      touch-action:manipulation;
+    }
+  }
+  @media(max-width:680px){
+    #telessageApp{height:100vh!important;height:100dvh!important;min-height:0!important}
+    #telessageApp .sidebar,#telessageApp .main{min-height:0!important}
+    #telessageApp .contacts,#telessageApp .messages{min-height:0!important;overscroll-behavior:contain}
+    #telessageApp .composer{padding-bottom:max(10px,env(safe-area-inset-bottom))!important}
+    /* Decorative layers must never sit above the controls and steal taps. */
+    #telessageApp .messages:before,#telessageApp .messages:after,
+    #telessageApp .sidebar:before,#telessageApp .sidebar:after{pointer-events:none!important}
+    body.telessage-mobile-ui #telessageApp:not(.mobile-chat-open) .sidebar{display:flex!important}
+    body.telessage-mobile-ui #telessageApp:not(.mobile-chat-open) .main{display:none!important}
+    body.telessage-mobile-ui.mobile-chat-open #telessageApp .sidebar{display:none!important}
+    body.telessage-mobile-ui.mobile-chat-open #telessageApp .main{display:flex!important}
+  }
+  @media(prefers-reduced-motion:reduce){
+    #telessageApp *,#telessageApp *:before,#telessageApp *:after{
+      scroll-behavior:auto!important;animation-duration:.01ms!important;
+      animation-iteration-count:1!important;transition-duration:.01ms!important;
+    }
+  }
+</style>
+<script id="telessage-mobile-hotfix-501-script">
+(function(){
+  // Repair stale mobile view state without reloading or losing the active session.
+  const app=document.getElementById('telessageApp');
+  if(!app)return;
+  const mobile=()=>window.matchMedia('(max-width:680px)').matches;
+  function syncMobileView(){
+    if(!mobile())return;
+    if(document.body.classList.contains('telessage-mobile-ui')){
+      const hasChat=!!(window.activeId||document.querySelector('#contacts .contact.active'));
+      document.body.classList.toggle('mobile-chat-open',hasChat);
+    }
+  }
+  window.addEventListener('pageshow',syncMobileView,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(syncMobileView,80),{passive:true});
+  window.addEventListener('resize',syncMobileView,{passive:true});
+  // Let the browser process taps normally; do not synthesize duplicate clicks.
+  document.addEventListener('touchmove',function(e){
+    if(e.target.closest('#telessageApp .contacts,#telessageApp .messages,#settingsModal .settings-dialog'))return;
+  },{passive:true});
+})();
+</script>
+
 </body></html>
